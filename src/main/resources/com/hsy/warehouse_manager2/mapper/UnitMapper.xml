@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hsy.warehouse_manager2.mapper.UnitMapper">
+
+<!--
+    //查询所有单位  给添加商品提供的
+public List<Unit> findAllUnit();
+-->
+    <select id="findAllUnit" resultType="unit">
+        select * from unit
+    </select>
+</mapper>
+  
+

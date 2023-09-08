@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hsy.warehouse_manager2.mapper.AuthMapper">
+<!--    //根据userId查询用户权限下的所有菜单的方法
+    public List<Auth> findAuthById(Integer userId);
+    -->
+    <select id="findAuthById" resultType="auth">
+        select distinct t3.* from user_role t1, role_auth t2, auth_info t3
+        where t1.role_id = t2.role_id and t2.auth_id = t3.auth_id
+          and t3.auth_state=1 and t1.user_id=#{userId};
+    </select>
+
+
+<!--
+    //根据角色id删除给角色已分配的所有权限(菜单)
+public int delAuthByRoleId(Integer roleId);
+-->
+    <delete id="delAuthByRoleId">
+        delete from role_auth where role_id = #{roleId}
+    </delete>
+
+<!--
+    //加载所有状态权限菜单树
+public List<Auth> getAllAuth();
+-->
+    <select id="getAllAuth" resultType="auth">
+        select * from auth_info where auth_state= 1
+    </select>
+
+<!--
+    //分配角色权限关系
+public void insertRoleAuth(@Param("roleId") Integer roleId,@Param("authId") Integer authId);
+-->
+    <insert id="insertRoleAuth">
+        insert into role_auth values (null,#{roleId},#{authId})
+    </insert>
+</mapper>
+  
+

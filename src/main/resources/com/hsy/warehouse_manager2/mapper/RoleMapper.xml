@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hsy.warehouse_manager2.mapper.RoleMapper">
+<!--
+ //查询所有角色
+    public List<Role> findAllRole(); role_state=1:是已请用
+    -->
+    <select id="findAllRole" resultType="role">
+        select * from role where role_state=1
+    </select>
+
+<!--
+    //查询用户已分配的角色
+    List<Role> findRolesByUserId(Integer userId);
+-->
+    <select id="findRolesByUserId" resultType="role">
+        select t2.*
+        from user_role t1,role t2
+        where t1.role_id=t2.role_id
+         and t1.user_id=#{userId}
+    </select>
+
+<!--
+    //根据角色名查角色id的方法
+    public Integer findRoleIdByName(@Param("roleName") String roleName);
+-->
+    <select id="findRoleIdByName">
+        select role_id
+        from role where role_name=#{roleName}
+    </select>
+
+<!--
+        //查询角色行数
+    public Integer findRoleRowCount(Role role);
+-->
+<select id="findRoleRowCount" resultType="integer">
+    select count(*) from role
+    <where>
+        <if test="roleName!=null and roleName !=''"> and role_name like concat('%',#{roleName},'%')</if>
+        <if test="roleCode!=null and roleCode!=''">and role_code like concat('%',#{roleCode},'%')</if>
+        <if test="roleState!=null and roleState!=''">and role_state =#{roleState}</if>
+    </where>
+</select>
+<!--
+
+    //分页查询角色的方法
+    public List<Role> findRolePage(@Param("page") Page page,@Param("role") Role role);
+-->
+    <select id="findRolePage" resultType="role">
+        select t1.*,t2.user_code getCode
+        from role t1,user_info t2
+        where t1.create_by = t2.user_id
+            <if test="role.roleName!=null and role.roleName !=''"> and t1.role_name like concat('%',#{role.roleName},'%')</if>
+            <if test="role.RoleCode!=null and role.roleCode!=''">and t1.role_code like concat('%',#{role.roleCode},'%')</if>
+            <if test="role.roleState!=null and role.roleState!=''">and t1.role_state = #{role.roleState}</if>
+        order by create_time desc
+        limit #{page.limitIndex}, #{page.pageSize}
+    </select>
+
+<!--    //查询角色是否重复的方法
+public Integer verifyRole(Role role);
+-->
+    <select id="verifyRole" resultType="role">
+        select *
+        from role where role_name=#{roleName} or role_code=#{roleCode};
+    </select>
+
+<!--
+    //添加角色
+public Integer addRole(Role role);
+-->
+    <insert id="addRole">
+        insert into role values (null,#{roleName},#{roleDesc},#{roleCode},0,#{createBy},now(),null,null)
+    </insert>
+
+    <!--
+    //修改角色状态
+    public Integer modifyRoleState(Role role);
+    -->
+    <update id="modifyRoleState">
+        update role set role_state=#{roleState} where role_id=#{roleId}
+    </update>
+
+
+<!--
+        //删除角色
+public Integer deleteRole(Integer roleId);
+-->
+    <delete id="deleteRole">
+        delete
+        from role
+        where role_id=#{roleId};
+    </delete>
+
+<!--
+    //查询角色已分配的权限(菜单)id的业务方法
+public List<Integer> findAuthIds(Integer roleId);
+-->
+    <select id="findAuthIds" resultType="integer">
+        select auth_id from role_auth where role_id=#{roleId}
+    </select>
+
+    <!--
+    //删除角色id
+public Integer deleteAuthIdByRoleId(Integer roleId);
+-->
+    <delete id="deleteAuthIdByRoleId">
+        delete from role_auth where role_id=#{roleId}
+    </delete>
+
+    <!--
+    //根据roleId修改roleDesc 校色描述
+public Integer modifyRoleDesc(Role role);
+-->
+    <update id="modifyRoleDesc">
+        update role set role_desc=#{roleDesc},update_by=#{updateBy},update_time=now()
+        where role_id =#{roleId}
+    </update>
+</mapper>
+
+
+
